@@ -3,7 +3,6 @@
 ## Tentative Plan:
 I am planning to build a python library which would extract metadata from image datasets to transform them into tables and bring them into a SQL-like query-ready format. Given an image of a popular format (for instance, png or jpeg) this python module would extract useful features to eliminate the need to manually develop data-loaders for preprocessing. Those features might be (not limited to) size, edges, corners, blobs, color-maps, etc.
 
-##_________________________________________________________________________________________________________________
 ## Current Code Version Documentation:
 This Python script performs feature extraction on images and generates SQL INSERT statements to populate database tables. Here's a breakdown of what the script does:
 
@@ -34,7 +33,6 @@ An arbitrary number (num) is also included as the first field in each INSERT sta
 4. SQL Statement Saving
 The SQL INSERT statements are written to a single .sql file named 'Inserts.sql'. Each statement is on a new line for readability.
 
-##____________________________________________________________________________
 ## Expected Features:
 Automatically extracting the features universal for most image datasets and transforming them into a structured form would allow using conventional SQL queries on those metadata tables significantly cutting down the time spent on developing case-specific dataloaders and, most importantly, bringing SQL’s flexibility and speed.
 A further step that might be taken later is to test the generated metadata tables in scalable NoSQL databases.
