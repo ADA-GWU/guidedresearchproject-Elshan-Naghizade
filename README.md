@@ -1,7 +1,7 @@
 # Elshan Naghizade Guided Research
 
 ## Tentative Plan:
-I am planning to build a python library which would extract metadata from image datasets to transform them into tables and bring them into a SQL-like query-ready format. Given an image of a popular format (for instance, png or jpeg) this python module would extract useful features to eliminate the need to manually develop data-loaders for preprocessing. Those features might be (not limited to) size, edges, corners, blobs, color-maps, etc.
+I am planning to build a python library which would extract features and metadata from image datasets to transform them into tables and bring them into a SQL-like query-ready format. Given an image of a popular format (for instance, png or jpeg) this python module would extract useful features to eliminate the need to manually develop data-loaders for preprocessing. Those features might be (not limited to) size, edges, corners, blobs, color-maps, etc.
 
 ## Under Progress:
 - Using blobs to store images instead of relative OS paths (Recommended by Dr. Hasanov)
