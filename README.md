@@ -3,6 +3,11 @@
 ## Tentative Plan:
 I am planning to build a python library which would extract metadata from image datasets to transform them into tables and bring them into a SQL-like query-ready format. Given an image of a popular format (for instance, png or jpeg) this python module would extract useful features to eliminate the need to manually develop data-loaders for preprocessing. Those features might be (not limited to) size, edges, corners, blobs, color-maps, etc.
 
+## Under Progress:
+-- Using blobs to store images instead of relative OS paths (Recommended by Dr. Hasanov)
+-- Will be connecting the codebase to PostreSQL (the initial plan was to utilize MySQL)
+-- Modify the input/output flow of the class to conform with general python library guidelines (Recommended by Dr. Kaisler)
+
 ## Current Version's Documentation:
 This Python script performs feature extraction on images and generates SQL INSERT statements to populate database tables. Here's a breakdown of what the script does:
 
