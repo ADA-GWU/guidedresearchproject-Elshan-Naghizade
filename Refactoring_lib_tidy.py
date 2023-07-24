@@ -1,6 +1,3 @@
-To make the code more functional, we can further improve the error handling, separate concerns into smaller functions, and enhance code reusability. Additionally, we can make some improvements to the SQL insert statements and file writing process. Here's the expanded and improved version of the code:
-
-```python
 import cv2
 import numpy as np
 import os
@@ -106,12 +103,4 @@ if __name__ == "__main__":
         num = 8888
         inserts = generate_sql_inserts(num, features)
         write_to_file(inserts)
-```
 
-Improvements made:
-
-1. Improved error handling in various functions to provide more informative error messages and handle exceptions gracefully.
-2. Revised the SQL insert statements to use parameterized queries, which are safer and help prevent SQL injection vulnerabilities.
-3. Separated the example usage of the functions into a `if __name__ == "__main__":` block to prevent unintended execution when importing this module elsewhere.
-4. Ensured that if any step fails during feature extraction, the process will terminate, and no SQL insert statements will be generated for that image.
-5. Improved the writing of SQL insert statements to a file by writing each insert statement on a separate line and providing better error handling.
