@@ -2,6 +2,24 @@ import psycopg2
 import numpy as np
 import io
 
+def create_connection(db_connection):
+    try:
+        # Establish a database connection
+        conn = psycopg2.connect(db_connection)
+        return conn
+    except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
+        print(f"Error connecting to the database: {e}")
+        return None
+
+def close_connection(conn, cursor=None):
+    try:
+        if cursor:
+            cursor.close()
+        conn.close()
+        print("Database connection closed.")
+    except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
+        print(f"Error closing the database connection: {e}")
+
 def insert_image_as_blob(image_array, db_connection, table_name, column_name):
     # Convert image array to bytes
     image_bytes = image_array.tobytes()
@@ -9,8 +27,11 @@ def insert_image_as_blob(image_array, db_connection, table_name, column_name):
     # Create a BytesIO object to hold the image data
     blob_data = io.BytesIO(image_bytes)
 
-    # Establish a database connection
-    conn = psycopg2.connect(db_connection)
+    # Create a database connection
+    conn = create_connection(db_connection)
+    if not conn:
+        return
+
     cursor = conn.cursor()
 
     try:
@@ -26,7 +47,6 @@ def insert_image_as_blob(image_array, db_connection, table_name, column_name):
         # Rollback the transaction on error
         conn.rollback()
         print(f"Error inserting image blob: {e}")
-
-    # Close the cursor and database connection
-    cursor.close()
-    conn.close()
+    finally:
+        # Close the cursor and database connection
+        close_connection(conn, cursor)
