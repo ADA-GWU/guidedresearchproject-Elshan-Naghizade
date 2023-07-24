@@ -9,34 +9,44 @@ I am planning to build a python library which would extract data and features fr
 - Modify the input/output flow of the class to conform with general python library guidelines (Recommended by Dr. Kaisler)
 
 ## Current Version's Documentation:
-This Python script performs feature extraction on images and generates SQL INSERT statements to populate database tables. Here's a breakdown of what the script does:
+#### init(self, db_name='image_features.db', db_connection=None)
+This is the constructor for the ImageFeatureDataset class. It initializes the class with the database name or database connection string. It also calls the create_tables() method to ensure that the necessary tables exist in the database.
 
-1. File Path Gathering
-The function get_file_paths(directory) takes a directory path as input and returns a list of all file paths in the directory and its subdirectories. This is achieved through the use of os.walk(), which recursively traverses through the directory tree.
+#### connect(self)
+This is a context manager for handling the database connections. It opens a connection to the specified database and yields a cursor for executing SQL statements. After execution, it ensures that the connection is closed.
 
-2. Image Feature Extraction
-The function extract_features(image_path) takes the path of an image file as input and performs the following tasks:
+#### create_tables(self)
+This method creates the necessary tables in the database if they do not exist. It creates two tables: images and features.
 
-Loads the image with OpenCV.
-Extracts and saves the image array as a numpy array.
-Computes the color histogram of the image and saves it as a numpy array.
-Converts the image to grayscale for edge and corner detection.
-Detects edges using the Canny method and saves them as a numpy array.
-Detects corners using the Shi-Tomasi method and saves them as a numpy array.
-All features are saved as numpy arrays with a corresponding name to their image file. The function returns three tuples containing information for insertion into the Main_tab_, Array_Tab_, and Feature_Tab_ tables.
+#### compute_color_histogram(self, image)
+Computes a color histogram of the input image in HSV color space and returns it as a 1D array.
 
-3. SQL Statement Generation
-The script then generates SQL INSERT statements using the tuples returned by extract_features(). Each tuple is formatted as the VALUES clause in an INSERT statement for the corresponding table.
+#### detect_edges(self, image)
+Detects edges in the input image using the Canny edge detection algorithm and returns a binary image with detected edges.
 
-The SQL statements are as follows:
+#### detect_corners(self, image)
+Detects corners in the input image using the Shi-Tomasi corner detection algorithm and returns a binary image with detected corners.
 
-main_sql: This statement inserts the image location, height, width, number of channels, and file type into the Main_tab_ table.
-array_sql: This statement inserts the location of the saved numpy array and the array data type into the Array_Tab_ table.
-feature_sql: This statement inserts the locations of the saved histogram, edges, and corners numpy arrays into the Feature_Tab_ table.
-An arbitrary number (num) is also included as the first field in each INSERT statement.
+#### insert_image_and_features(self, image_path)
+Takes an image path as input, computes features of the image (color histogram, edges, corners), and inserts them into the database.
 
-4. SQL Statement Saving
-The SQL INSERT statements are written to a single .sql file named 'Inserts.sql'. Each statement is on a new line for readability.
+#### update_image_and_features(self, image_path)
+Takes an image path as input, recomputes features of the image (color histogram, edges, corners), and updates them in the database.
+
+#### delete_image_and_features(self, image_path)
+Deletes the record of the specified image and its associated features from the database.
+
+#### get_all_images(self)
+Retrieves the paths of all images stored in the database.
+
+#### get_image_and_features(self, image_path)
+Retrieves the features of the specified image from the database.
+
+#### numpy_array_to_blob(self, array)
+Converts a numpy array into a binary format that can be stored in the database.
+
+#### blob_to_numpy_array(self, blob, shape=None)
+Converts a binary format back into a numpy array. The shape of the original array must be provided if it was not a 1D array.
 
 ## Expected Features:
 Automatically extracting the features universal for most image datasets and transforming them into a structured form would allow using conventional SQL queries on those metadata tables significantly cutting down the time spent on developing case-specific dataloaders and, most importantly, bringing SQL’s flexibility and speed.
