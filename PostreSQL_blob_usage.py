@@ -4,7 +4,6 @@ import io
 
 def create_connection(db_connection):
     try:
-        # Establish a database connection
         conn = psycopg2.connect(db_connection)
         return conn
     except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
@@ -20,14 +19,16 @@ def close_connection(conn, cursor=None):
     except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
         print(f"Error closing the database connection: {e}")
 
+def create_table(cursor, table_name, column_name):
+    try:
+        cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (id SERIAL PRIMARY KEY, {column_name} BYTEA)")
+        print(f"Table '{table_name}' created successfully.")
+    except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
+        print(f"Error creating the '{table_name}' table: {e}")
+
 def insert_image_as_blob(image_array, db_connection, table_name, column_name):
-    # Convert image array to bytes
     image_bytes = image_array.tobytes()
-
-    # Create a BytesIO object to hold the image data
     blob_data = io.BytesIO(image_bytes)
-
-    # Create a database connection
     conn = create_connection(db_connection)
     if not conn:
         return
@@ -35,18 +36,51 @@ def insert_image_as_blob(image_array, db_connection, table_name, column_name):
     cursor = conn.cursor()
 
     try:
-        # Open the blob file for reading
+        create_table(cursor, table_name, column_name)
+
         with blob_data as blob_file:
-            # Execute the INSERT query
             cursor.execute(f"INSERT INTO {table_name} ({column_name}) VALUES (%s)", (psycopg2.Binary(blob_file.read()),))
 
-        # Commit the transaction
         conn.commit()
         print("Image blob inserted successfully!")
     except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
-        # Rollback the transaction on error
         conn.rollback()
         print(f"Error inserting image blob: {e}")
     finally:
-        # Close the cursor and database connection
+        close_connection(conn, cursor)
+
+def retrieve_image_blob(db_connection, table_name, column_name, image_id):
+    conn = create_connection(db_connection)
+    if not conn:
+        return None
+
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(f"SELECT {column_name} FROM {table_name} WHERE id = %s", (image_id,))
+        binary_data = cursor.fetchone()[0]
+
+        image_array = np.frombuffer(binary_data, dtype=np.uint8)
+        return image_array
+    except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
+        print(f"Error retrieving image blob: {e}")
+        return None
+    finally:
+        close_connection(conn, cursor)
+
+def get_all_image_ids(db_connection, table_name):
+    conn = create_connection(db_connection)
+    if not conn:
+        return []
+
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(f"SELECT id FROM {table_name}")
+        image_ids = [row[0] for row in cursor.fetchall()]
+        return image_ids
+    except (psycopg2.DatabaseError, psycopg2.OperationalError) as e:
+        print(f"Error retrieving image IDs: {e}")
+        return []
+    finally:
         close_connection(conn, cursor)
